@@ -95,7 +95,63 @@ class HashMap
         previous = current # update prev
         current = current.next # update current 
       end
-    end    
+    end   
   end
 
+  #length returns the number of stored keys in the hash map
+  def length 
+    count = 0
+    current = @buckets[0]
+
+    while current
+      count += 1
+      current = current.next
+    end
+    count 
+  end  
+
+  #clear removes all entries in the hash map.
+  def clear
+    @buckets = Array.new
+  end
+
+  #keys returns an array containing all the keys inside the hash map.
+  def keys 
+    keys = []
+    @buckets.each do |bucket|
+      current = bucket
+      while current 
+        keys << current.key
+        current = current.next
+      end
+    end   
+    return keys 
+  end
+
+  #values returns an array containing all the values.
+  def values 
+    values = []
+    @buckets.each do |bucket|
+      current = bucket
+      while current 
+        values << current.value
+        current = current.next
+      end
+    end
+    return values 
+  end
+  
+
+  #entries returns an array that contains each key, value pair. Example: [[first_key, first_value], [second_key, second_value]]
+  def entries 
+    entries = []
+    @buckets.each do |bucket|
+      current = bucket 
+      while current 
+        entries << [current.key, current.value]
+        current = current.next
+      end
+    end
+    return entries
+  end
 end

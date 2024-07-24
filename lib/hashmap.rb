@@ -1,64 +1,79 @@
-class HashMap 
-  #create the buckets array
-  
-  def initialize
-    @buckets = Array.new
+class HashMap
+  MAX_LOAD_FACTOR = 0.75
+
+  def initialize(size)
+    @buckets = Array.new(size)
+    @size = 0  
   end
 
-  # hash function
-  def hash(key) 
+  def hash(key)
     hash_code = 0
     prime_number = 31
-       
     key.each_char { |char| hash_code = prime_number * hash_code + char.ord }
-       
     hash_code
   end
 
+  def load_factor
+    @size.to_f / @buckets.size
+  end
+
+  def rehash
+    old_buckets = @buckets
+    new_capacity = @buckets.size * 2
+    @buckets = Array.new(new_capacity)
+    @size = 0
+    old_buckets.each do |bucket|
+      current = bucket
+      while current
+        set(current.key, current.value)
+        current = current.next
+      end
+    end
+  end
+
+  # add/overwrite entries to hashmap
   def set(key, value)
+    rehash if load_factor > MAX_LOAD_FACTOR
     new_node = Node.new(key, value)
-    index = hash(key)
+    index = hash(key) % @buckets.size
     raise IndexError if index.negative? || index >= @buckets.length
-    
-    if @buckets[index].nil? #handle empty bucket, just add the node
+    if @buckets[index].nil? 
       @buckets[index] = new_node
-      return 
-    else # if not empty 
+      @size += 1
+    else  
       current = @buckets[index]
-      while current # iterate content in bucket 
-        if current.key == new_node.key # if same keys
-          current.value = new_node.value #overwrite value
+      while current 
+        if current.key == new_node.key 
+          current.value = new_node.value 
           return
         end
-        if current.next.nil? #reached the end of the linked list
-          current.next = new_node # append node at the end of the list
+        if current.next.nil? 
+          current.next = new_node 
+          @size += 1
           return  
         end
+        current = current.next
       end
     end   
   end
 
   #get(key) takes one argument as a key and returns the value that is assigned to this key. 
   #If key is not found, return nil.
-    
   def get(key)
-    index = hash(key)
+    index = hash(key) % @buckets.size
     current = @buckets[index]
-
     while current
       return current.value if current.key == key
       current = current.next
     end
     nil     
-  end   
+  end
 
   #has?(key) takes a key as an argument 
   #returns true or false based on whether or not the key is in the hash map.
-  
   def has?(key)
-    index = hash(key)
+    index = hash(key) % @buckets.size
     current = @buckets[index]
-
     while current 
       if current.key == key 
         return true
@@ -73,46 +88,38 @@ class HashMap
   #If the given key is in the hash map, it should remove the entry with that key 
   #and return the deleted entry’s value. 
   #If the key isn’t in the hash map, it should return nil.
-  
   def remove(key)
-    index = hash(key)
-       
-    if !has?(key) # if the key doesn't exists
+    index = hash(key) % @buckets.size
+    if !has?(key)
       return nil 
     else       
       current = @buckets[index]
       previous = nil
-
       while current 
         if current.key == key
-          if previous.nil? #it's the first element of the list
-            @buckets[index] = current.next #replace with next element
-          else #it's not the first element
-            previous.next = current.next #update previous pointer to the next element 
+          if previous.nil? 
+            @buckets[index] = current.next 
+          else 
+            previous.next = current.next 
           end
+          @size -= 1
           return current.value 
         end
-        previous = current # update prev
-        current = current.next # update current 
+        previous = current 
+        current = current.next  
       end
     end   
   end
 
   #length returns the number of stored keys in the hash map
   def length 
-    count = 0
-    current = @buckets[0]
-
-    while current
-      count += 1
-      current = current.next
-    end
-    count 
+    @size
   end  
 
   #clear removes all entries in the hash map.
   def clear
-    @buckets = Array.new
+    @buckets = Array.new(@buckets.size)
+    @size = 0
   end
 
   #keys returns an array containing all the keys inside the hash map.
@@ -141,7 +148,6 @@ class HashMap
     return values 
   end
   
-
   #entries returns an array that contains each key, value pair. Example: [[first_key, first_value], [second_key, second_value]]
   def entries 
     entries = []

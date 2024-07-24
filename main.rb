@@ -1,7 +1,9 @@
 require_relative 'lib/hashmap'
 require_relative 'lib/node'
 
-test = HashMap.new
+DEFAULT_SIZE = 16
+
+test = HashMap.new(DEFAULT_SIZE)
 
 test.set('apple', 'red')
 test.set('banana', 'yellow')
@@ -15,5 +17,5 @@ test.set('ice cream', 'white')
 test.set('jacket', 'blue')
 test.set('kite', 'pink')
 test.set('lion', 'golden')
+test.set('moon', 'silver')
 
-puts test

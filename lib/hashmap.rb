@@ -36,7 +36,66 @@ class HashMap
         end
       end
     end   
+  end
+
+  #get(key) takes one argument as a key and returns the value that is assigned to this key. 
+  #If key is not found, return nil.
     
+  def get(key)
+    index = hash(key)
+    current = @buckets[index]
+
+    while current
+      return current.value if current.key == key
+      current = current.next
+    end
+    nil     
+  end   
+
+  #has?(key) takes a key as an argument 
+  #returns true or false based on whether or not the key is in the hash map.
+  
+  def has?(key)
+    index = hash(key)
+    current = @buckets[index]
+
+    while current 
+      if current.key == key 
+        return true
+      else
+        current = current.next
+      end
+    end
+    return false 
+  end
+
+  #remove(key) takes a key as an argument
+  #If the given key is in the hash map, it should remove the entry with that key 
+  #and return the deleted entry’s value. 
+  #If the key isn’t in the hash map, it should return nil.
+  
+  def remove(key)
+    index = hash(key)
+       
+    if !has?(key) # if the key doesn't exists
+      return nil 
+    else       
+      current = @buckets[index]
+      previous = nil
+
+      while current 
+        if current.key == key
+          if previous.nil? #it's the first element of the list
+            @buckets[index] = current.next #replace with next element
+          else #it's not the first element
+            previous.next = current.next #update previous pointer to the next element 
+          end
+          return current.value 
+        end
+        previous = current # update prev
+        current = current.next # update current 
+      end
+    end    
   end
 
 end
